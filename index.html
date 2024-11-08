@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Blind Game with Levels, Score, and Timer</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <div class="game-container">
+        <!-- إضافة إدخال اسم اللاعب -->
+        <div id="player-name-input" class="input-container">
+            <h2>أدخل الاسم</h2>
+            <input type="text" id="playerName" placeholder="اسمك هنا" />
+            <button class="button" onclick="startGame()">ابدأ اللعبة</button>
+            <p id="name-error" class="error-message hidden">من فضلك، أدخل اسم صالح.</p>
+        </div>
+
+        <!-- منطقة اللعبة بعد بدء اللعبة -->
+        <div id="game-area" style="display: none;">
+            <h1>Find the Different Color</h1>
+            <p>Select Difficulty Level:</p>
+            <button class="button" onclick="startGame('easy')">Easy</button>
+            <button class="button" onclick="startGame('medium')">Medium</button>
+            <button class="button" onclick="startGame('hard')">Hard</button>
+            
+            <div class="score-timer">
+                <span class="score">Score: <span id="score">0</span></span>
+                <span class="timer">Time: <span id="timer">60</span>s</span>
+            </div>
+            
+            <div id="grid" class="grid"></div>
+            
+            <p id="message"></p>
+            <p id="motivationMessage" class="hidden"></p>
+
+            <!-- عرض الاسم هنا -->
+            <p>الاسم: <span id="player-name-display"></span></p>
+        </div>
+    </div>
+
+    <script src="./script.js"></script>
+</body>
+</html>
