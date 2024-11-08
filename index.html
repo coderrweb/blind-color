@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Blind Game</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet"> <!-- For icons -->
+    <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Body Styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #121212; /* Default dark mode background */
+            color: #ffffff; /* Default text color for dark mode */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            position: relative;
+        }
+
+        /* Light mode styles */
+        body.light-mode {
+            background-color: #f5f5f5;
+            color: #333; /* Dark text for light background */
+        }
+
+        /* Game container */
+        .game-container {
+            background: rgba(0, 0, 0, 0.8); /* Dark mode background */
+            border-radius: 10px;
+            padding: 30px 40px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            max-width: 600px;
+            width: 100%;
+            transition: background 0.3s ease;
+        }
+
+        /* Game container in light mode */
+        .game-container.light-mode {
+            background: rgba(255, 255, 255, 0.9); /* Light mode background */
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            color: inherit; /* Inherit text color from body */
+        }
+
+        p {
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            color: inherit;
+        }
+
+        /* Buttons */
+        .button {
+            margin: 10px;
+            padding: 15px 30px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        .button:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+        }
+
+        /* Score and Timer */
+        .score-timer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: inherit;
+        }
+
+        /* Grid Container */
+        .grid {
+            display: grid;
+            gap: 10px;
+            margin-top: 30px;
+            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); /* Responsive grid */
+        }
+
+        .grid div {
+            cursor: pointer;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .grid div:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Motivation Message */
+        #motivationMessage {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #4caf50;
+            margin-top: 20px;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        /* Game End message */
+        #message {
+            font-size: 1.5em;
+            margin-top: 30px;
+        }
+
+        /* Media Queries for Responsiveness */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            .button {
+                font-size: 1em;
+                padding: 12px 25px;
+            }
+
+            .score-timer {
+                font-size: 1em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .game-container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .button {
+                font-size: 0.9em;
+                padding: 10px 20px;
+            }
+
+            .score-timer {
+                font-size: 0.9em;
+            }
+        }
+
+        /* Toggle Button Styles */
+        .toggle-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s;
+        }
+
+        .toggle-button:hover {
+            background-color: #45a049;
+        }
+
+        .toggle-button i {
+            margin-right: 8px; /* Space between icon and text */
+        }
+    </style>
+</head>
+<body>
+    <button class="toggle-button" onclick="toggleMode()">
+        <i class="fas fa-moon"></i> <!-- Moon Icon for Dark Mode -->
+        <span id="mode-text">Dark Mode</span>
+    </button>
+
+    <div class="game-container">
+        <h1>Find the Different Color</h1>
+        <p>Select Difficulty Level:</p>
+        <button class="button" onclick="startGame('easy')">Easy</button>
+        <button class="button" onclick="startGame('medium')">Medium</button>
+        <button class="button" onclick="startGame('hard')">Hard</button>
+        <div class="score-timer">
+            <span class="score">Score: <span id="score">0</span></span>
+            <span class="timer">Time: <span id="timer">60</span>s</span>
+        </div>
+        <div id="grid" class="grid"></div>
+        <p id="message"></p>
+        <p id="motivationMessage"></p>
+    </div>
+
+    <script>
+        const grid = document.getElementById("grid");
+        const message = document.getElementById("message");
+        const scoreDisplay = document.getElementById("score");
+        const timerDisplay = document.getElementById("timer");
+        const motivationMessage = document.getElementById("motivationMessage");
+        let targetColor, targetIndex, colors = [];
+        let score = 0;
+        let timeLeft = 60;
+        let timerInterval;
+
+        function startGame(level) {
+            score = 0;
+            timeLeft = 60;
+            updateScore();
+            updateTimer();
+            clearInterval(timerInterval);
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimer();
+                if (timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+
+            nextTurn(level);
+        }
+
+        function nextTurn(level) {
+            grid.innerHTML = "";
+            message.textContent = "";
+
+            let gridSize, colorDifference;
+            switch(level) {
+                case 'easy':
+                    gridSize = 3;
+                    colorDifference = 60;
+                    break;
+                case 'medium':
+                    gridSize = 4;
+                    colorDifference = 40;
+                    break;
+                case 'hard':
+                    gridSize = 5;
+                    colorDifference = 20;
+                    break;
+            }
+
+            grid.style.gridTemplateColumns = `repeat(${gridSize}, minmax(60px, 1fr))`;
+
+            const baseColor = getRandomColor();
+            colors = generateSimilarColors(baseColor, gridSize * gridSize, colorDifference);
+            
+            targetIndex = Math.floor(Math.random() * colors.length);
+            targetColor = alterColor(baseColor, colorDifference);
+            colors[targetIndex] = targetColor;
+
+            for (let i = 0; i < colors.length; i++) {
+                const colorDiv = document.createElement("div");
+                colorDiv.style.backgroundColor = colors[i];
+                colorDiv.style.paddingTop = "100%"; // Responsive square
+                colorDiv.style.position = "relative";
+                colorDiv.addEventListener("click", () => checkChoice(i, level));
+                grid.appendChild(colorDiv);
+            }
+        }
+
+        function checkChoice(index, level) {
+            if (index === targetIndex) {
+                score++;
+                message.textContent = "Correct! Moving to next turn...";
+                message.style.color = "green";
+                setTimeout(() => nextTurn(level), 1000); // Proceed to next turn after a short delay
+            } else {
+                message.textContent = "Wrong choice. Try again...";
+                message.style.color = "red";
+            }
+            updateScore();
+            if (score % 10 === 0) {
+                showMotivationMessage();
+            }
+        }
+
+        function showMotivationMessage() {
+            let msg = "";
+            if (score === 10) {
+                msg = "رائع! لقد حصلت على 10 نقاط! استمر في التقدم!";
+            } else if (score === 20) {
+                msg = "ممتاز! لقد حصلت على 20 نقطة! تقدم رائع، استمر!";
+            } else if (score === 30) {
+                msg = "مذهل! 30 نقطة! يمكنك فعل المزيد!";
+            } else if (score === 40) {
+                msg = "رائع جدًا! 40 نقطة! أنت محترف في اللعبة!";
+            }
+            motivationMessage.textContent = msg;
+            motivationMessage.style.opacity = 1;
+            setTimeout(() => {
+                motivationMessage.style.opacity = 0;
+            }, 3000);
+        }
+
+        function updateScore() {
+            scoreDisplay.textContent = score;
+        }
+
+        function updateTimer() {
+            timerDisplay.textContent = timeLeft;
+        }
+
+        function endGame() {
+            clearInterval(timerInterval);
+            grid.innerHTML = "";
+            message.textContent = `Game Over! Your final score is: ${score}.`;
+            message.style.color = "#fff";
+
+            if (score < 20) {
+                message.textContent += " - Bad";
+            } else if (score < 40) {
+                message.textContent += " - Good";
+            } else {
+                message.textContent += " - Perfect";
+            }
+        }
+
+        function getRandomColor() {
+            const r = Math.floor(Math.random() * 256);
+            const g = Math.floor(Math.random() * 256);
+            const b = Math.floor(Math.random() * 256);
+            return `rgb(${r}, ${g}, ${b})`;
+        }
+
+        function generateSimilarColors(baseColor, count, variation) {
+            const [r, g, b] = baseColor.match(/\d+/g).map(Number);
+            const colors = [];
+            for (let i = 0; i < count; i++) {
+                colors.push(`rgb(${r + getRandomVariation(variation)}, ${g + getRandomVariation(variation)}, ${b + getRandomVariation(variation)})`);
+            }
+            return colors;
+        }
+
+        function getRandomVariation(variation) {
+            return Math.floor(Math.random() * variation) - (variation / 2);
+        }
+
+        function alterColor(color, amount) {
+            const [r, g, b] = color.match(/\d+/g).map(Number);
+            return `rgb(${Math.min(255, r + amount)}, ${Math.min(255, g + amount)}, ${Math.min(255, b + amount)})`;
+        }
+
+        // Toggle Dark/Light Mode
+        function toggleMode() {
+            document.body.classList.toggle('light-mode');
+            document.querySelector('.game-container').classList.toggle('light-mode');
+            const modeText = document.getElementById('mode-text');
+            const icon = document.querySelector('.toggle-button i');
+
+            if (document.body.classList.contains('light-mode')) {
+                modeText.textContent = 'Light Mode';
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            } else {
+                modeText.textContent = 'Dark Mode';
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            }
+        }
+    </script>
+</body>
+</html>
