@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Butterfly Hunt</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="game-container">
+    <div id="header">
+      <h1>Butterfly Hunt</h1>
+      <div id="score-board">
+        <span id="score">Stars: 0</span>
+        <span id="timer">Time: 01:00</span>
+      </div>
+    </div>
+    <div id="game-area">
+      <!-- Butterflies will appear here -->
+    </div>
+    <div id="message"></div>
+    <div id="certificate"></div>
+    <button id="play-again" style="display: none;" onclick="reloadPage()">Play Again</button>
+    <a href="./index.html" class="bt"><button class="button">Back to Menu</button></a>
+  </div>
+
+  <audio id="succ"  src="./correct-156911.mp3" preload="auto"></audio>
+  <audio id="wrong" src="./wrong-47985.mp3" preload="auto"></audio>
+
+  <script src="script.js"></script>
+</body>
+</html>
